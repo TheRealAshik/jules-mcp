@@ -32,7 +32,7 @@ Choose the installation method that fits your workflow. Both methods require a *
 The fastest way to get started. Copy the block below and paste it into your AI assistant (Antigravity, Cursor, or Claude).
 
 ```markdown
-Read https://raw.githubusercontent.com/TheRealAshik/jules-mcp/main/docs/SELF_INSTALL.md and do as per the instructions. I have my JULES_API_KEY ready.
+Read https://raw.githubusercontent.com/TheRealAshik/jules-mcp/refs/heads/main/docs/AGENT_INSTALL.md and do as per the instructions. I have my JULES_API_KEY ready.
 ```
 </details>
 
