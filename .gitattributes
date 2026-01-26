@@ -1,0 +1,6 @@
+# Override GitHub language detection
+*.ts linguist-language=TypeScript
+*.js linguist-generated=true
+*.cjs linguist-documentation=true
+node_modules/* linguist-vendored
+dist/* linguist-generated=true

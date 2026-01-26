@@ -1,0 +1,83 @@
+name: Publish to npm & GitHub 🚀
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version level (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      create_release:
+        description: 'Create GitHub Release?'
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install & Build 📦
+        run: |
+          npm ci
+          npm run build
+
+      # --- MANUAL DISPATCH STEPS ---
+      - name: Configure Git (Manual) ⚙️
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+      - name: Bump Version (Manual) 🏷️
+        if: github.event_name == 'workflow_dispatch'
+        id: bump_version
+        run: |
+          npm version ${{ inputs.version }} -m "chore(release): %s"
+          echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      # --- AUTO/TAG TRIGGER STEPS ---
+      - name: Set Tag Env (Auto)
+        if: github.event_name == 'push'
+        run: |
+          echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      # --- COMMON STEPS ---
+      - name: Publish to npm 🚀
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push Changes (Manual) ⬆️
+        if: github.event_name == 'workflow_dispatch'
+        run: git push origin main --follow-tags
+
+      - name: Create GitHub Release 🎉
+        if: inputs.create_release == true || github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ env.TAG_NAME }} \
+            --title "Release ${{ env.TAG_NAME }}" \
+            --generate-notes
