@@ -302,6 +302,20 @@ class JulesMCPServer {
             },
           },
           {
+            name: 'jules_delete_worker',
+            description: 'Delete a worker session',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                session_id: {
+                  type: 'string',
+                  description: 'Worker session ID to delete',
+                },
+              },
+              required: ['session_id'],
+            },
+          },
+          {
             name: 'jules_get_status',
             description: 'Check worker status and progress',
             inputSchema: {
@@ -357,6 +371,8 @@ class JulesMCPServer {
             return await this.handleFixBug(args);
           case 'jules_review_code':
             return await this.handleReviewCode(args);
+          case 'jules_delete_worker':
+            return await this.handleDeleteWorker(args);
           case 'jules_get_status':
             return await this.handleGetStatus(args);
           case 'jules_list_sources':
@@ -608,6 +624,17 @@ class JulesMCPServer {
     const sessionId = await this.workerManager.reviewCode(parsed.source, parsed.code, parsed.language, parsed.focus_areas);
     return {
       content: [{ type: 'text', text: JSON.stringify({ status: 'success', session_id: sessionId, message: 'Code review worker created' }, null, 2) }],
+    };
+  }
+
+  private async handleDeleteWorker(args: Record<string, unknown> | undefined) {
+    const schema = z.object({ session_id: z.string().min(1) });
+    const parsed = schema.parse(args);
+    if (!this.workerManager) throw new Error('Worker manager not initialized');
+
+    await this.workerManager.deleteWorker(parsed.session_id);
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ status: 'success', message: `Worker ${parsed.session_id} deleted` }, null, 2) }],
     };
   }
 

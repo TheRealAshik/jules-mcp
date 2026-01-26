@@ -144,6 +144,21 @@ export class JulesAPIClient {
     }
   }
 
+  async deleteSession(sessionId: string): Promise<void> {
+    try {
+      await this.client.delete(`/sessions/${sessionId}`);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          throw new Error(`Session not found: ${sessionId}`);
+        }
+        const errorMsg = `Failed to delete session (HTTP ${error.response?.status}): ${error.response?.data}`;
+        throw new Error(errorMsg);
+      }
+      throw new Error(`Failed to delete session: ${error}`);
+    }
+  }
+
   async close(): Promise<void> {
     // Axios doesn't need explicit cleanup like httpx
   }
