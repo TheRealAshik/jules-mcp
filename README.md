@@ -66,13 +66,12 @@ If you prefer to configure the server yourself, follow these steps:
 
 ## 📖 Overview
 
-**Jules MCP** is a high-performance Model Context Protocol (MCP) server designed to supercharge AI coding assistants. While standard AI agents are limited to linear task execution, Jules MCP introduces **Staged Orchestration**—enabling a "Commander" agent to deploy multiple specialized sub-agents (Maestros, Crews, Freelancers) to handle distinct parts of a project simultaneously or in sequence.
+**Jules MCP** is a Model Context Protocol (MCP) server designed to supercharge AI coding agent to control the **Jules**. While standard AI agents are limited to linear task execution, Jules MCP introduces **Staged Orchestration**—enabling a "Commander" agent to deploy multiple specialized sub-agents (Maestros, Crews, Freelancers) to handle distinct parts of a project simultaneously or in sequence.
 
-Built on top of the Google Jules API and the MCP SDK, it provides the bridge between your IDE and a distributed team of AI workers.
+Built on top of the **Google Jules API**, it provides the bridge between your IDE and a distributed team of AI workers.
 
 > [!TIP]
-> Jules MCP works best when allowed to manage its own branches. Ensure your `JULES_API_KEY` has repository write access for the best experience.
-
+> Use IDE agents to analyse and assign tasks to Jules to get best output from this MCP.
 ---
 
 ## 🚀 Features
