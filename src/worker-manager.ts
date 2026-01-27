@@ -168,6 +168,16 @@ export class WorkerManager {
     return worker;
   }
 
+  async deleteWorker(sessionId: string): Promise<void> {
+    const worker = this.workers.get(sessionId);
+    if (!worker) {
+      throw new Error(`Worker not found: ${sessionId}`);
+    }
+
+    await this.julesClient.deleteSession(sessionId);
+    this.workers.delete(sessionId);
+  }
+
   getAllWorkers(): WorkerSession[] {
     return Array.from(this.workers.values());
   }
