@@ -11,10 +11,8 @@
 ## 🗺️ Navigation
 
 - [📖 Overview](#-overview)
-- [🚀 Features](#-features)
 - [⚙️ Setup](#-setup)
-- [🛠 Development](#-development)
-- [📂 Knowledge Base](#-knowledge-base)
+- [🚀 Features](#-features)
 - [🌟 Support](#-support)
 
 ---
@@ -85,29 +83,6 @@ Built on top of the **Google Jules API**, it provides the bridge between your ID
 - **🛡️ Quality Enforcement:** Built-in review cycles ensure code meets security and performance standards before merging.
 - **⚡ Zero Configuration:** Instantly usable via `npx` with automatic environment discovery.
 </details>
-
----
-
-## 🛠 Development
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/TheRealAshik/jules-mcp.git
-
-# 2. Install dependencies
-npm install
-
-# 3. Build & Run
-npm run build
-npm start
-```
-
----
-
-## 📂 Knowledge Base
-
-- 🔧 **[SKILLS.md](./SKILLS.md)** - Comprehensive tool mapping documentation.
-- 🤖 **[SELF_INSTALL.md](./docs/SELF_INSTALL.md)** - Logic for AI agent self-installation.
 
 ---
 
