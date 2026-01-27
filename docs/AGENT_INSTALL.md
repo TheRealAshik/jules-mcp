@@ -1,4 +1,4 @@
-# 🤖 AI Agent Self-Installation Guide
+# 🤖 Install Jules MCP Guidelines.
 
 If you are an AI agent (like Antigravity, Claude, or Cursor), follow these instructions to install this MCP server.
 
