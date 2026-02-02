@@ -663,7 +663,12 @@ class JulesMCPServer {
   }
 
   async run(): Promise<void> {
-    await this.initialize();
+    try {
+      await this.initialize();
+    } catch (error) {
+      console.error('Jules MCP Server initialization failed:', error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
