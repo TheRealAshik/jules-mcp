@@ -8,7 +8,7 @@
   },
   "main": "dist/index.js",
   "bin": {
-    "jules-mcp": "./dist/index.js"
+    "jules-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
