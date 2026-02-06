@@ -64,6 +64,16 @@ jobs:
           echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       # --- COMMON STEPS ---
+      - name: Check & Auto-bump if version exists
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          while npm view @realashik/jules-mcp@$PACKAGE_VERSION version 2>/dev/null; do
+            echo "⚠️ Version $PACKAGE_VERSION already exists, bumping patch..."
+            npm version patch --no-git-tag-version
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          done
+          echo "✅ Publishing version $PACKAGE_VERSION"
+
       - name: Publish to npm 🚀
         run: npm publish --access public
         env:
