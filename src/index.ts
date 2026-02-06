@@ -663,17 +663,18 @@ class JulesMCPServer {
   }
 
   async run(): Promise<void> {
-    try {
-      await this.initialize();
-    } catch (error) {
-      console.error('Jules MCP Server initialization failed:', error instanceof Error ? error.message : String(error));
-      process.exit(1);
-    }
-
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
 
     console.error('Jules MCP Server running on stdio');
+
+    try {
+      await this.initialize();
+      console.error('Jules MCP Server initialized successfully');
+    } catch (error) {
+      console.error('Jules MCP Server initialization failed:', error instanceof Error ? error.message : String(error));
+      console.error('Server will continue running but tools may not work properly');
+    }
   }
 }
 
