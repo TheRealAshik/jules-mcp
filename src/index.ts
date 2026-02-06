@@ -9,7 +9,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import * as dotenv from 'dotenv';
-import { JulesAPIClient } from './jules-client.js';
+import { JulesSDKClient } from './jules-sdk-client.js';
 import { WorkerManager } from './worker-manager.js';
 
 // Load environment variables
@@ -21,7 +21,7 @@ const API_VERSION = process.env.JULES_API_VERSION || 'v1alpha';
 
 class JulesMCPServer {
   private server: Server;
-  private julesClient: JulesAPIClient | null = null;
+  private julesClient: JulesSDKClient | null = null;
   private workerManager: WorkerManager | null = null;
 
   constructor() {
@@ -45,7 +45,7 @@ class JulesMCPServer {
       throw new Error('JULES_API_KEY environment variable is required');
     }
 
-    this.julesClient = new JulesAPIClient(API_KEY, BASE_URL, API_VERSION);
+    this.julesClient = new JulesSDKClient(API_KEY);
     this.workerManager = new WorkerManager(this.julesClient);
   }
 
@@ -121,6 +121,25 @@ class JulesMCPServer {
                   type: 'number',
                   description: 'Maximum number of activities to return (default: 10)',
                   default: 10,
+                },
+              },
+              required: ['session_id'],
+            },
+          },
+          {
+            name: 'jules_stream_activities',
+            description: 'Stream real-time activities from a Jules worker session (SDK feature)',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                session_id: {
+                  type: 'string',
+                  description: 'Worker session ID',
+                },
+                max_activities: {
+                  type: 'number',
+                  description: 'Maximum number of activities to stream (default: 50)',
+                  default: 50,
                 },
               },
               required: ['session_id'],
@@ -353,6 +372,8 @@ class JulesMCPServer {
             return await this.handleSendMessage(args);
           case 'jules_get_activities':
             return await this.handleGetActivities(args);
+          case 'jules_stream_activities':
+            return await this.handleStreamActivities(args);
           case 'jules_estimate_work':
             return await this.handleEstimateWork(args);
           case 'jules_store_memory':
@@ -499,6 +520,59 @@ class JulesMCPServer {
               session_id: parsed.session_id,
               activities,
               count: activities.length,
+            }, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMsg = error.errors.map((e: { path: (string | number)[]; message: string }) => `${e.path.join('.')}: ${e.message}`).join(', ');
+        throw new Error(`Validation error: ${errorMsg}`);
+      }
+      throw error;
+    }
+  }
+
+  private async handleStreamActivities(args: Record<string, unknown> | undefined) {
+    try {
+      const schema = z.object({
+        session_id: z.string().min(1, 'Session ID cannot be empty'),
+        max_activities: z.number().min(1).max(200).default(50),
+      });
+
+      const parsed = schema.parse(args);
+
+      if (!this.julesClient) {
+        throw new Error('Jules client not initialized');
+      }
+
+      const session = this.julesClient.getSessionObject(parsed.session_id);
+      const activities = [];
+      let count = 0;
+
+      for await (const activity of session.stream()) {
+        activities.push({
+          type: activity.type,
+          id: activity.id,
+          createTime: activity.createTime,
+          originator: activity.originator,
+          data: activity,
+        });
+        
+        count++;
+        if (count >= parsed.max_activities) break;
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              status: 'success',
+              session_id: parsed.session_id,
+              activities,
+              count: activities.length,
+              streaming: true,
             }, null, 2),
           },
         ],

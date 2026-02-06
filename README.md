@@ -64,12 +64,15 @@ If you prefer to configure the server yourself, follow these steps:
 
 ## 📖 Overview
 
-**Jules MCP** is a Model Context Protocol (MCP) server designed to supercharge AI coding agent to control the **Jules**. While standard AI agents are limited to linear task execution, Jules MCP introduces **Staged Orchestration**—enabling a "Commander" agent to deploy multiple specialized sub-agents (Maestros, Crews, Freelancers) to handle distinct parts of a project simultaneously or in sequence.
+**Jules MCP** is a Model Context Protocol (MCP) server designed to supercharge AI coding agents to control **Jules**. While standard AI agents are limited to linear task execution, Jules MCP introduces **Staged Orchestration**—enabling a "Commander" agent to deploy multiple specialized sub-agents (Maestros, Crews, Freelancers) to handle distinct parts of a project simultaneously or in sequence.
 
-Built on top of the **Google Jules API**, it provides the bridge between your IDE and a distributed team of AI workers.
+Built on top of the **official [@google/jules-sdk](https://github.com/google-labs-code/jules-sdk)**, it provides the bridge between your IDE and a distributed team of AI workers with advanced features like real-time streaming, session management, and intelligent caching.
 
 > [!TIP]
 > Use IDE agents to analyse and assign tasks to Jules to get best output from this MCP.
+
+> [!NOTE]
+> **v1.0.4+** now uses the official Google Jules SDK for improved reliability, streaming support, and better error handling.
 ---
 
 ## 🚀 Features
@@ -82,6 +85,8 @@ Built on top of the **Google Jules API**, it provides the bridge between your ID
 - **🧠 Global Shared Memory:** Cross-session memory allows workers to pass variables and context like biological collaborators.
 - **🛡️ Quality Enforcement:** Built-in review cycles ensure code meets security and performance standards before merging.
 - **⚡ Zero Configuration:** Instantly usable via `npx` with automatic environment discovery.
+- **🌊 Real-time Streaming:** Stream live activity updates from Jules sessions using the official SDK.
+- **🔄 Session Management:** Simplified session lifecycle with automatic polling and state management.
 </details>
 
 ---

@@ -36,3 +36,4 @@ logs/
 # Cache
 .eslintcache
 *.tsbuildinfo
+.kiro/
