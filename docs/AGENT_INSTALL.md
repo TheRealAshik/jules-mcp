@@ -22,15 +22,19 @@ If you are an AI agent (like Antigravity, Claude, or Cursor), follow these instr
 ```json
 "jules-mcp": {
   "command": "npx",
-  "args": ["-y", "@realashik/jules-mcp"],
+  "args": ["-y", "@realashik/jules-mcp@latest"],
   "env": {
     "JULES_API_KEY": "<REPLACE_WITH_JULES_API_KEY>"
   }
 }
 ```
 
+> [!IMPORTANT]
+> Always use `@latest` tag to ensure you get the most recent version and avoid initialization errors from outdated packages.
+
 4. **Verify and Initialize**:
    - **Live Verification**: Before concluding, run a test command to ensure the key works: `$env:JULES_API_KEY='<KEY>'; npx -y @realashik/jules-mcp@latest`.
+   - **Clear Cache**: If users report "connection closed: initialize response" errors, instruct them to remove any globally installed version: `npm uninstall -g @realashik/jules-mcp` and restart their IDE.
    - **IDE Refresh**: Explicitly tell the user: *"You may need to refresh your MCP servers or restart the IDE for these changes to take effect."*
    - **Verification Tool**: Try calling `jules_list_sources` to confirm the API key and connection are working correctly.
 

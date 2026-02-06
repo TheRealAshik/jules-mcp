@@ -156,13 +156,21 @@ export class WorkerManager {
       return null;
     }
 
-    try {
-      // Get latest status from Jules API
-      const response = await this.julesClient.getSession(sessionId);
-      worker.status = response.status || worker.status;
-      worker.lastActivity = new Date();
-    } catch (error) {
-      console.error(`Failed to get status for worker ${sessionId}:`, error);
+    // Get latest status from Jules API with retry
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const response = await this.julesClient.getSession(sessionId);
+        worker.status = response.status || worker.status;
+        worker.lastActivity = new Date();
+        break;
+      } catch (error) {
+        if (attempt === 2) {
+          console.error(`Failed to get status for worker ${sessionId} after 2 attempts:`, error);
+          // Return cached worker info instead of failing
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
     }
 
     return worker;

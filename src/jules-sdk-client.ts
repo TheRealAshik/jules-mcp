@@ -27,31 +27,47 @@ export class JulesSDKClient {
     title: string,
     githubBranch: string = 'main'
   ): Promise<SessionInfo> {
-    try {
-      // Parse source format: "sources/github/owner/repo"
-      const githubMatch = source.match(/sources\/github\/([^/]+)\/(.+)/);
-      if (!githubMatch) {
-        throw new Error(`Invalid source format: ${source}. Expected: sources/github/owner/repo`);
-      }
-
-      const [, owner, repo] = githubMatch;
-      const session = await this.julesClient.session({
-        prompt,
-        source: { github: `${owner}/${repo}`, baseBranch: githubBranch },
-        title,
-      });
-
-      return {
-        sessionId: session.id,
-        name: `sessions/${session.id}`,
-        status: 'created',
-      };
-    } catch (error) {
-      if (error instanceof JulesError) {
-        throw new Error(`Jules SDK Error: ${error.message}`);
-      }
-      throw error;
+    // Parse source format: "sources/github/owner/repo"
+    const githubMatch = source.match(/sources\/github\/([^/]+)\/(.+)/);
+    if (!githubMatch) {
+      throw new Error(`Invalid source format: ${source}. Expected: sources/github/owner/repo`);
     }
+
+    const [, owner, repo] = githubMatch;
+    
+    // Retry logic for session creation
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const session = await this.julesClient.session({
+          prompt,
+          source: { github: `${owner}/${repo}`, baseBranch: githubBranch },
+          title,
+        });
+
+        // Verify session was created successfully
+        if (!session || !session.id) {
+          throw new Error('Session created but no ID returned');
+        }
+
+        return {
+          sessionId: session.id,
+          name: `sessions/${session.id}`,
+          status: 'created',
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        if (attempt < 3) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          continue;
+        }
+      }
+    }
+
+    if (lastError instanceof JulesError) {
+      throw new Error(`Jules SDK Error after 3 attempts: ${lastError.message}`);
+    }
+    throw lastError || new Error('Failed to create session after 3 attempts');
   }
 
   async getSession(sessionId: string): Promise<SessionInfo> {
@@ -59,6 +75,10 @@ export class JulesSDKClient {
       const session = this.julesClient.session(sessionId);
       const info = await session.info();
       
+      if (!info || !info.id) {
+        throw new Error('Invalid session info returned');
+      }
+
       return {
         sessionId: info.id,
         status: info.state,
