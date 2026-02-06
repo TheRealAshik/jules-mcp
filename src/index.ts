@@ -42,7 +42,9 @@ class JulesMCPServer {
 
   private async initialize(): Promise<void> {
     if (!API_KEY) {
-      throw new Error('JULES_API_KEY environment variable is required');
+      console.error('ERROR: JULES_API_KEY environment variable is required');
+      console.error('Please set JULES_API_KEY in your MCP configuration');
+      return;
     }
 
     this.julesClient = new JulesSDKClient(API_KEY);
