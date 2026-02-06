@@ -1,6 +1,6 @@
 {
   "name": "@realashik/jules-mcp",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "MCP server for orchestrating multiple Jules instances",
   "type": "module",
   "publishConfig": {
