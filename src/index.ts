@@ -41,14 +41,30 @@ class JulesMCPServer {
   }
 
   private async initialize(): Promise<void> {
-    if (!API_KEY) {
-      console.error('ERROR: JULES_API_KEY environment variable is required');
-      console.error('Please set JULES_API_KEY in your MCP configuration');
-      return;
-    }
+    try {
+      if (!API_KEY) {
+        const error = new Error('JULES_API_KEY environment variable is required');
+        console.error('ERROR:', error.message);
+        console.error('Please set JULES_API_KEY in your MCP configuration');
+        console.error('Initialization failed at:', new Date().toISOString());
+        throw error;
+      }
 
-    this.julesClient = new JulesSDKClient(API_KEY);
-    this.workerManager = new WorkerManager(this.julesClient);
+      console.error('Initializing Jules SDK client...');
+      this.julesClient = new JulesSDKClient(API_KEY);
+      this.workerManager = new WorkerManager(this.julesClient);
+      console.error('Jules SDK client initialized successfully');
+    } catch (error) {
+      console.error('INITIALIZATION ERROR:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        apiKeyPresent: !!API_KEY,
+        baseUrl: BASE_URL,
+        apiVersion: API_VERSION,
+      });
+      throw error;
+    }
   }
 
   private setupToolHandlers(): void {
@@ -739,13 +755,25 @@ class JulesMCPServer {
   }
 
   async run(): Promise<void> {
-    await this.initialize();
-    console.error('Jules MCP Server initialized successfully');
+    try {
+      console.error('Starting Jules MCP Server initialization...');
+      await this.initialize();
+      console.error('Jules MCP Server initialized successfully');
 
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
+      console.error('Connecting to MCP transport...');
+      const transport = new StdioServerTransport();
+      await this.server.connect(transport);
 
-    console.error('Jules MCP Server running on stdio');
+      console.error('Jules MCP Server running on stdio');
+    } catch (error) {
+      console.error('RUN ERROR:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        phase: 'server_startup',
+      });
+      throw error;
+    }
   }
 }
 
@@ -760,8 +788,41 @@ import { fileURLToPath } from 'url';
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
 
 if (isMainModule) {
+  // Global error handlers
+  process.on('uncaughtException', (error) => {
+    console.error('UNCAUGHT_EXCEPTION:', {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+    });
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.error('UNHANDLED_REJECTION:', {
+      reason: reason instanceof Error ? reason.message : String(reason),
+      stack: reason instanceof Error ? reason.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
+    process.exit(1);
+  });
+
   main().catch((error) => {
-    console.error('Fatal error:', error);
+    console.error('FATAL ERROR:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      env: {
+        apiKeyPresent: !!process.env.JULES_API_KEY,
+        baseUrl: process.env.JULES_API_BASE_URL || 'https://jules.googleapis.com',
+        apiVersion: process.env.JULES_API_VERSION || 'v1alpha',
+        nodeVersion: process.version,
+      },
+    });
+    console.error('\nTroubleshooting:');
+    console.error('1. Verify JULES_API_KEY is set in MCP configuration');
+    console.error('2. Check network connectivity to Jules API');
+    console.error('3. Run with KIRO_LOG_LEVEL=trace for detailed logs');
     process.exit(1);
   });
 }

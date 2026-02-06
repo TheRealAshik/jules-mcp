@@ -18,7 +18,20 @@ export class JulesSDKClient {
   private julesClient: typeof jules;
 
   constructor(apiKey: string) {
-    this.julesClient = jules.with({ apiKey });
+    try {
+      if (!apiKey || apiKey.trim() === '') {
+        throw new Error('API key is empty or invalid');
+      }
+      console.error('Configuring Jules SDK with API key...');
+      this.julesClient = jules.with({ apiKey });
+      console.error('Jules SDK configured successfully');
+    } catch (error) {
+      console.error('JULES_SDK_CLIENT_INIT_ERROR:', {
+        message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString(),
+      });
+      throw error;
+    }
   }
 
   async createSession(
@@ -57,6 +70,13 @@ export class JulesSDKClient {
         };
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
+        console.error(`SESSION_CREATE_ATTEMPT_${attempt}_FAILED:`, {
+          message: lastError.message,
+          attempt,
+          timestamp: new Date().toISOString(),
+          source,
+          isJulesError: error instanceof JulesError,
+        });
         if (attempt < 3) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
           continue;
