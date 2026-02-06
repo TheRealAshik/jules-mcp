@@ -1,4 +1,4 @@
-import { JulesAPIClient } from './jules-client.js';
+import { JulesSDKClient } from './jules-sdk-client.js';
 
 export enum WorkerRole {
   MAESTRO = 'MAESTRO',
@@ -64,7 +64,7 @@ export class WorkerManager {
   private workers: Map<string, WorkerSession> = new Map();
   private memoryStore: Map<string, string> = new Map();
 
-  constructor(private julesClient: JulesAPIClient) { }
+  constructor(private julesClient: JulesSDKClient) { }
 
   async createWorker(
     prompt: string,
