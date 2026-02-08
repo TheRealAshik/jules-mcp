@@ -7,13 +7,7 @@
 
 ## ⚠️ Deprecated Notice
 
-**Jules MCP** is now deprecated. Google Labs has released their official Jules SDK with native Model Context Protocol (MCP) support, making this community package obsolete.
-
-### 🚀 Recommended Migration
-
-**Use the official package instead:**
-```bash
-npm install @google/jules-sdk
+**Jules MCP** is now deprecated. Google Labs has released their official Jules SDK with native Model Context Protocol (MCP) support, making this community package obsolete. 
 
 <div align="center">
 
