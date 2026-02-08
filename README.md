@@ -1,4 +1,21 @@
 <div align="center">
+  
+[![Deprecated](https://img.shields.io/badge/Status-Deprecated-red?style=flat-square)](https://github.com/TheRealAshik/jules-mcp)
+[![Use Instead](https://img.shields.io/badge/Use_Official_SDK-blue?style=flat-square)](https://github.com/google-labs-code/jules-sdk)
+
+</div>
+
+## ⚠️ Deprecated Notice
+
+**Jules MCP** is now deprecated. Google Labs has released their official Jules SDK with native Model Context Protocol (MCP) support, making this community package obsolete.
+
+### 🚀 Recommended Migration
+
+**Use the official package instead:**
+```bash
+npm install @google/jules-sdk
+
+<div align="center">
 
 [![NPM Version](https://img.shields.io/npm/v/@realashik/jules-mcp?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@realashik/jules-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
